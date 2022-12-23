@@ -18,7 +18,9 @@ from mmseg.apis import multi_gpu_test, single_gpu_test
 from mmseg.datasets import build_dataloader, build_dataset
 from mmseg.models import build_segmentor
 from mmseg.utils import build_ddp, build_dp, get_device, setup_multi_processes
-
+import pandas as pd
+import numpy as np
+import json
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -295,7 +297,7 @@ def main():
             pre_eval=args.eval is not None and not eval_on_format_results,
             format_only=args.format_only or eval_on_format_results,
             format_args=eval_kwargs)
-
+    
     rank, _ = get_dist_info()
     if rank == 0:
         if args.out:
@@ -314,7 +316,26 @@ def main():
             if tmpdir is not None and eval_on_format_results:
                 # remove tmp dir when cityscapes evaluation
                 shutil.rmtree(tmpdir)
+    
+    submission = pd.read_csv('/opt/ml/input/code/submission/sample_submission.csv', index_col=None)
+    
+    with open("/opt/ml/input/data/test.json", "r", encoding="utf8") as f: data = json.load(f)
+            
+    for idx, predict in enumerate(results):
+        file_name = data["images"][idx]["file_name"]
+        
+        temp_mask = []
+        predict = predict.reshape(1, 512, 512)
+        mask = predict.reshape((1, 256, 2, 256, 2)).max(4).max(2)
+        temp_mask.append(mask)
+        oms = np.array(temp_mask)
+        oms = oms.reshape([oms.shape[0], 256*256]).astype(int)
 
+        string = oms.flatten()
+        submission = submission.append({"image_id" : file_name, "PredictionString" : ' '.join(str(e) for e in string.tolist())}, 
+                                    ignore_index=True)
+
+    submission.to_csv('/opt/ml/input/code/submission/deeplabv3_r50.csv', index=False)
 
 if __name__ == '__main__':
     main()
