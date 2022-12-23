@@ -18,120 +18,9 @@ from mmseg.apis import multi_gpu_test, single_gpu_test
 from mmseg.datasets import build_dataloader, build_dataset
 from mmseg.models import build_segmentor
 from mmseg.utils import build_ddp, build_dp, get_device, setup_multi_processes
-
-import albumentations as A
-import numpy as np
 import pandas as pd
-from tqdm import tqdm
-
-from pycocotools.coco import COCO
-import cv2
-from torch.utils.data import Dataset, DataLoader
-from albumentations.pytorch import ToTensorV2
-
-dataset_path  = '/opt/ml/input/data'
-category_names = ["Background","General trash","Paper","Paper pack","Metal","Glass","Plastic","Styrofoam","Plastic bag","Battery","Clothing",]
-
-def get_classname(classID, cats):
-    for i in range(len(cats)):
-        if cats[i]['id']==classID:
-            return cats[i]['name']
-    return "None"
-
-class CustomDataLoader(Dataset):
-    """COCO format"""
-    def __init__(self, data_dir, mode = 'train', transform = None):
-        super().__init__()
-        self.mode = mode
-        self.transform = transform
-        self.coco = COCO(data_dir)
-
-    def __getitem__(self, index: int):
-        # dataset이 index되어 list처럼 동작
-        image_id = self.coco.getImgIds(imgIds=index)
-        image_infos = self.coco.loadImgs(image_id)[0]
-        
-        # cv2 를 활용하여 image 불러오기
-        images = cv2.imread(os.path.join(dataset_path, image_infos['file_name']))
-        images = cv2.cvtColor(images, cv2.COLOR_BGR2RGB).astype(np.float32)
-        images /= 255.0
-        
-        if (self.mode in ('train', 'val')):
-            ann_ids = self.coco.getAnnIds(imgIds=image_infos['id'])
-            anns = self.coco.loadAnns(ann_ids)
-
-            # Load the categories in a variable
-            cat_ids = self.coco.getCatIds()
-            cats = self.coco.loadCats(cat_ids)
-
-            # masks : size가 (height x width)인 2D
-            # 각각의 pixel 값에는 "category id" 할당
-            # Background = 0
-            masks = np.zeros((image_infos["height"], image_infos["width"]))
-            # General trash = 1, ... , Cigarette = 10
-            anns = sorted(anns, key=lambda idx : idx['area'], reverse=True)
-            for i in range(len(anns)):
-                className = get_classname(anns[i]['category_id'], cats)
-                pixel_value = category_names.index(className)
-                masks[self.coco.annToMask(anns[i]) == 1] = pixel_value
-            masks = masks.astype(np.int8)
-                        
-            # transform -> albumentations 라이브러리 활용
-            if self.transform is not None:
-                transformed = self.transform(image=images, mask=masks)
-                images = transformed["image"]
-                masks = transformed["mask"]
-            return images, masks, image_infos
-        
-        if self.mode == 'test':
-            # transform -> albumentations 라이브러리 활용
-            if self.transform is not None:
-                transformed = self.transform(image=images)
-                images = transformed["image"]
-            return images, image_infos
-    
-    def __len__(self) -> int:
-        # 전체 dataset의 size를 return
-        return len(self.coco.getImgIds())
-
-def collate_fn(batch):
-    return tuple(zip(*batch))
-
-
-def test(model, data_loader, device):
-    size = 256
-    transform = A.Compose([A.Resize(size, size)])
-    print('Start prediction.')
-    
-    model.eval()
-    
-    file_name_list = []
-    preds_array = np.empty((0, size*size), dtype=np.long)
-    
-    with torch.no_grad():
-        for step, _, (imgs, masks, image_infos) in enumerate(tqdm(data_loader)):
-            
-            # inference (512 x 512)
-            outs = model(torch.stack(imgs).to(device))['out']
-            oms = torch.argmax(outs.squeeze(), dim=1).detach().cpu().numpy()
-            
-            # resize (256 x 256)
-            temp_mask = []
-            for img, mask in zip(np.stack(imgs), oms):
-                transformed = transform(image=img, mask=mask)
-                mask = transformed['mask']
-                temp_mask.append(mask)
-                
-            oms = np.array(temp_mask)
-            
-            oms = oms.reshape([oms.shape[0], size*size]).astype(int)
-            preds_array = np.vstack((preds_array, oms))
-            
-            file_name_list.append([i['file_name'] for i in image_infos])
-    print("End prediction.")
-    file_names = [y for x in file_name_list for y in x]
-    
-    return file_names, preds_array
+import numpy as np
+import json
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -408,7 +297,7 @@ def main():
             pre_eval=args.eval is not None and not eval_on_format_results,
             format_only=args.format_only or eval_on_format_results,
             format_args=eval_kwargs)
-
+    
     rank, _ = get_dist_info()
     
     if rank == 0:
@@ -428,37 +317,26 @@ def main():
             if tmpdir is not None and eval_on_format_results:
                 # remove tmp dir when cityscapes evaluation
                 shutil.rmtree(tmpdir)
+    
+    submission = pd.read_csv('/opt/ml/input/code/submission/sample_submission.csv', index_col=None)
+    
+    with open("/opt/ml/input/data/test.json", "r", encoding="utf8") as f: data = json.load(f)
+            
+    for idx, predict in enumerate(results):
+        file_name = data["images"][idx]["file_name"]
+        
+        temp_mask = []
+        predict = predict.reshape(1, 512, 512)
+        mask = predict.reshape((1, 256, 2, 256, 2)).max(4).max(2)
+        temp_mask.append(mask)
+        oms = np.array(temp_mask)
+        oms = oms.reshape([oms.shape[0], 256*256]).astype(int)
 
-
-    test_path = dataset_path + '/test.json'
-
-    test_transform = A.Compose([
-                            ToTensorV2()
-                            ])
-
-    test_dataset = CustomDataLoader(data_dir=test_path, mode='test', transform=test_transform)
-
-    test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
-                                            batch_size=4,
-                                            num_workers=4,
-                                            collate_fn=collate_fn)
-
-
-
-
-
-    submission = pd.read_csv('/opt/ml/submission/sample_submission.csv', index_col=None)
-
-    # test set에 대한 prediction
-    file_names, preds = test(model, test_loader, cfg.device)
-
-    # PredictionString 대입
-    for file_name, string in zip(file_names, preds):
+        string = oms.flatten()
         submission = submission.append({"image_id" : file_name, "PredictionString" : ' '.join(str(e) for e in string.tolist())}, 
                                     ignore_index=True)
 
-    # submission.csv로 저장
-    submission.to_csv("/opt/ml/submission/fcn_resnet50_best_model(pretrained)2.csv", index=False)
+    submission.to_csv('/opt/ml/input/code/submission/deeplabv3_r50.csv', index=False)
 
 if __name__ == '__main__':
     main()

@@ -1,3 +1,5 @@
+import json
+
 # dataset settings
 dataset_type = "CustomDataset"
 data_root = "/opt/ml/input/data"
@@ -5,6 +7,8 @@ img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True
 )
 crop_size = (512, 512)
+
+cfg = json.load(open("/opt/ml/config.json", "r"))
 
 classes = [
     "Background",
@@ -84,8 +88,8 @@ data = dict(
         type=dataset_type,
         data_root=data_root,
         # reduce_zero_label=True,
-        img_dir= "mmseg_all/images/training",
-        ann_dir= "mmseg_all/annotations/training",
+        img_dir= cfg['train_img_path'],
+        ann_dir= cfg['train_mask_path'],
         pipeline=train_pipeline,
         classes=classes,
         palette=palette,
@@ -94,8 +98,8 @@ data = dict(
         type=dataset_type,
         data_root=data_root,
         # reduce_zero_label=True,
-        img_dir="mmseg3/images/validation",
-        ann_dir="mmseg3/annotations/validation",
+        img_dir=cfg['valid_img_path'],
+        ann_dir=cfg['valid_mask_path'],
         pipeline=val_pipeline,
         classes=classes,
         palette=palette,
@@ -104,8 +108,8 @@ data = dict(
         type=dataset_type,
         data_root=data_root,
         # reduce_zero_label=True,
-        img_dir="mmseg3/test",
-        ann_dir="mmseg3/test",
+        img_dir=cfg['test_path'],
+        # ann_dir="",
         pipeline=test_pipeline,
         classes=classes,
         palette=palette,

@@ -14,6 +14,7 @@ from mmseg.utils import get_root_logger
 from .builder import DATASETS
 from .pipelines import Compose, LoadAnnotations
 
+import wandb
 
 @DATASETS.register_module()
 class CustomDataset(Dataset):
@@ -483,5 +484,9 @@ class CustomDataset(Dataset):
                 key + '.' + str(name): value[idx] / 100.0
                 for idx, name in enumerate(class_names)
             })
+
+        wandb.log(
+            {"mIoU" :ret_metrics_summary["mIou"]}
+        )   
 
         return eval_results
