@@ -9,6 +9,9 @@ _base_ = [
 ]
 
 model = dict(pretrained='open-mmlab://resnet101_v1c', backbone=dict(depth=101))
+model = dict(
+    decode_head=dict(num_classes=11), 
+    auxiliary_head=dict(num_classes=11))
 
 # optimizer
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)
