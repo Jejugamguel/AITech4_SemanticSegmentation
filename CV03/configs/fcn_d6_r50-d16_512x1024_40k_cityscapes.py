@@ -1,21 +1,14 @@
 import wandb
 _base_ = [
     '../../mmsegmentation/configs/_base_/models/fcn_r50-d8.py', '../_base_/custom.py',
-    '../../mmsegmentation/configs/_base_/default_runtime.py'
+    '../../mmsegmentation/configs/_base_/default_runtime.py','../_base_/scheduler_epochs_60.py',
 ]
 model = dict(
     backbone=dict(dilations=(1, 1, 1, 2), strides=(1, 2, 2, 1)),
     decode_head=dict(dilation=6,num_classes=11),
     auxiliary_head=dict(dilation=6, num_classes=11))
 
-optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)
-optimizer_config = dict()
-# learning policy
-lr_config = dict(policy='poly', power=0.9, min_lr=1e-4, by_epoch=False)
-# runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=10)
-checkpoint_config = dict(interval=5, max_keep_ckpts=5)
-evaluation = dict(interval=1, metric='mIoU', pre_eval=True)
+
 
 
 wandb.login()
