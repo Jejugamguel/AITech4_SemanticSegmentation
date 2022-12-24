@@ -8,10 +8,11 @@ _base_ = [
     # '../../../mmsegmentation/configs/_base_/schedules/schedule_40k.py'
 ]
 
-model = dict(pretrained='open-mmlab://resnet101_v1c', backbone=dict(depth=101))
-model = dict(
-    decode_head=dict(num_classes=11), 
-    auxiliary_head=dict(num_classes=11))
+model = dict(pretrained='open-mmlab://resnet101_v1c', 
+            backbone=dict(depth=101),
+            decode_head=dict(num_classes=11), 
+            auxiliary_head=dict(num_classes=11))
+
 
 
 
@@ -45,7 +46,7 @@ log_config = dict(
             init_kwargs=dict(
                 project='Segmentation_project',
                 entity = 'aitech4_cv3',
-                name = "DeepLabv3+_resnet101_60e"),)
+                name = "DeepLabv3+_resnet101_60e_Test"),)
         # log_checkpoint=True,
         # log_checkpoint_metadata=True,
         # dict(type='TensorboardLoggerHook')
