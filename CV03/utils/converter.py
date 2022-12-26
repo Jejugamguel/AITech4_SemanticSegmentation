@@ -16,7 +16,7 @@ import numpy as np
 
 ROOT = '/opt/ml/input/data'
 TRAINJSON = '/opt/ml/input/data/train.json'
-VALJSON = './opt/ml/input/data/val.json'
+VALJSON = '/opt/ml/input/data/val.json'
 TESTJSON = '/opt/ml/input/data/test.json'
 
 category_names = [
@@ -43,11 +43,13 @@ category_names = [
 ./data/mmseg/test
 '''
 dir_lists = [
-    os.path.join(ROOT, 'mmseg_all', 'images', 'training'),
-    os.path.join(ROOT, 'mmseg3', 'images', 'validation'),
-    os.path.join(ROOT, 'mmseg_all', 'annotations', 'training'),
-    os.path.join(ROOT, 'mmseg3', 'annotations', 'validation'),
-    os.path.join(ROOT, 'mmseg3', 'test')
+    # os.path.join(ROOT, 'mmseg', 'train'),
+    # os.path.join(ROOT, 'mmseg', 'train_mask'),
+    # os.path.join(ROOT, 'mmseg', 'valid'),
+    # os.path.join(ROOT, 'mmseg', 'valid_mask'),
+    # os.path.join(ROOT, 'mmseg_all', 'annotations', 'training'),
+    # os.path.join(ROOT, 'mmseg3', 'annotations', 'validation'),
+    os.path.join(ROOT, 'mmseg', 'test')
 ]
 
 
@@ -174,8 +176,8 @@ def main():
         mkdir_or_exist(dir)
 
     # copy images
-    copy_images(TRAINJSON, dir_lists[0])
-    create_mask(TRAINJSON, dir_lists[1])
+    copy_images(TESTJSON, dir_lists[0])
+    # create_mask(VALJSON, dir_lists[0])
     print('Done!')
 
 if __name__ == '__main__':

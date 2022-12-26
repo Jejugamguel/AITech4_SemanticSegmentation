@@ -1,8 +1,17 @@
+import wandb
+
+wandb.login()
+
 # yapf:disable
 log_config = dict(
     interval=50,
     hooks=[
         dict(type='TextLoggerHook', by_epoch=False),
+        dict(type='WandbLoggerHook',interval=10,
+            init_kwargs=dict(
+                project='Segmentation_project',
+                entity = 'aitech4_cv3',
+                name = "deeplabv3_r50"),)
         # dict(type='TensorboardLoggerHook')
         # dict(type='PaviLoggerHook') # for internal services
     ])
