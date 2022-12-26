@@ -40,8 +40,8 @@ lr_config = dict(
 data = dict(samples_per_gpu=4, workers_per_gpu=2)
 
 runner = dict(type='EpochBasedRunner', max_epochs=60)
-checkpoint_config = dict(interval=1, max_keep_ckpts=5)
-evaluation = dict(interval=1, metric='mIoU', pre_eval=True)
+checkpoint_config = dict(interval=1, max_keep_ckpts=3)
+evaluation = dict(interval=1, metric='mIoU', pre_eval=True,save_best='mIoU')
 
 wandb.login()
 # yapf:disable
