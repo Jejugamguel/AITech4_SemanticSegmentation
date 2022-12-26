@@ -42,12 +42,15 @@ lr_config = dict(
     min_lr=0.0,
     by_epoch=False)
 
-data = dict(samples_per_gpu=4)
+data = dict(samples_per_gpu=1)
 optimizer_config = dict(
     type='GradientCumulativeFp16OptimizerHook', cumulative_iters=2)
 
 fp16 = dict()
-
+# runtime settings
+runner = dict(type='EpochBasedRunner', max_epochs=30)
+checkpoint_config = dict(interval=1, max_keep_ckpts=3)
+evaluation = dict(interval=1, metric='mIoU', pre_eval=True,save_best='mIoU')
 wandb.login()
 # yapf:disable
 log_config = dict(
@@ -58,7 +61,7 @@ log_config = dict(
             init_kwargs=dict(
                 project='Segmentation_project',
                 entity = 'aitech4_cv3',
-                name = "segformer_mit-b2_60e"),)
+                name = "BEiT_large_30e"),)
         # log_checkpoint=True,
         # log_checkpoint_metadata=True,
     ])
