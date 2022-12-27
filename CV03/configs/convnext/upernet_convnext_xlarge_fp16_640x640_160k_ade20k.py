@@ -3,6 +3,8 @@ _base_ = [
     '../../_base_/custom.py', '../../../mmsegmentation/configs/_base_/default_runtime.py',
     '../../_base_/scheduler_epochs_60.py'
 ]
+import wandb
+
 crop_size = (640, 640)
 checkpoint_file = 'https://download.openmmlab.com/mmclassification/v0/convnext/downstream/convnext-xlarge_3rdparty_in21k_20220301-08aa5ddc.pth'  # noqa
 model = dict(
@@ -48,8 +50,29 @@ lr_config = dict(
     by_epoch=False)
 
 # By default, models are trained on 8 GPUs with 2 images per GPU
-data = dict(samples_per_gpu=2)
+data = dict(samples_per_gpu=4)
 # fp16 settings
 optimizer_config = dict(type='Fp16OptimizerHook', loss_scale='dynamic')
 # fp16 placeholder
 fp16 = dict()
+runner = dict(type='EpochBasedRunner', max_epochs=60)
+checkpoint_config = dict(interval=1, max_keep_ckpts=3)
+evaluation = dict(interval=1, metric='mIoU', pre_eval=True,save_best='mIoU')
+
+
+wandb.login()
+# yapf:disable
+log_config = dict(
+    interval=100,
+    hooks=[
+        dict(type='TextLoggerHook', by_epoch=True),
+        dict(type='WandbLoggerHook',interval=100,
+            init_kwargs=dict(
+                project='Segmentation_project',
+                entity = 'aitech4_cv3',
+                name = "Covnext"),)
+        # log_checkpoint=True,
+        # log_checkpoint_metadata=True,
+        # dict(type='TensorboardLoggerHook')
+        # dict(type='PaviLoggerHook') # for internal services
+    ])
