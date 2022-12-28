@@ -24,7 +24,6 @@ model = dict(
     test_cfg=dict(mode='slide', crop_size=(640, 640), stride=(426, 426)))
 
 optimizer = dict(
-    _delete_=True,
     type='AdamW',
     lr=2e-5,
     betas=(0.9, 0.999),
@@ -33,7 +32,6 @@ optimizer = dict(
     paramwise_cfg=dict(num_layers=24, layer_decay_rate=0.95))
 
 lr_config = dict(
-    _delete_=True,
     policy='poly',
     warmup='linear',
     warmup_iters=3000,
@@ -42,13 +40,13 @@ lr_config = dict(
     min_lr=0.0,
     by_epoch=False)
 
-data = dict(samples_per_gpu=1)
+data = dict(samples_per_gpu=2)
 optimizer_config = dict(
     type='GradientCumulativeFp16OptimizerHook', cumulative_iters=2)
 
 fp16 = dict()
 # runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=30)
+runner = dict(type='EpochBasedRunner', max_epochs=60)
 checkpoint_config = dict(interval=1, max_keep_ckpts=3)
 evaluation = dict(interval=1, metric='mIoU', pre_eval=True,save_best='mIoU')
 wandb.login()

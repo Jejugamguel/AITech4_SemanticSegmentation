@@ -6,7 +6,7 @@ data_root = "/opt/ml/input/data"
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True
 )
-crop_size = (512, 512)
+crop_size = (640, 640)
 
 cfg = json.load(open("/opt/ml/config.json", "r"))
 
@@ -41,7 +41,7 @@ palette = [
 train_pipeline = [
     dict(type="LoadImageFromFile"),
     dict(type="LoadAnnotations"),
-    dict(type="Resize", img_scale=(512, 512)),
+    dict(type="Resize", img_scale=(640, 640)),
     dict(type="RandomFlip", prob=0.5),
     dict(type="RandomRotate", prob=0.5, degree=45),
     dict(type="Normalize", **img_norm_cfg),
@@ -54,7 +54,7 @@ val_pipeline = [
     dict(type="LoadImageFromFile"),
     dict(
         type="MultiScaleFlipAug",
-        img_scale=(512, 512),
+        img_scale=(640, 640),
         flip=False,
         transforms=[
             dict(type="Resize", keep_ratio=True),
