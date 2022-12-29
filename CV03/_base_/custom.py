@@ -41,7 +41,7 @@ palette = [
 train_pipeline = [
     dict(type="LoadImageFromFile"),
     dict(type="LoadAnnotations"),
-    dict(type="Resize", img_scale=(512, 512)),
+    dict(type="Resize", img_scale=(640, 640)),
     dict(type="RandomFlip", prob=0.5),
     dict(type="RandomRotate", prob=0.5, degree=45),
     dict(type="Normalize", **img_norm_cfg),
@@ -54,7 +54,7 @@ val_pipeline = [
     dict(type="LoadImageFromFile"),
     dict(
         type="MultiScaleFlipAug",
-        img_scale=(512, 512),
+        img_scale=(640, 640),
         flip=False,
         transforms=[
             dict(type="Resize", keep_ratio=True),
@@ -70,7 +70,7 @@ test_pipeline = [
     dict(type="LoadImageFromFile"),
     dict(
         type="MultiScaleFlipAug",
-        img_scale=(512, 512),
+        img_scale=(640,640),
         flip=False,
         transforms=[
             dict(type="Resize", keep_ratio=True),
@@ -82,7 +82,7 @@ test_pipeline = [
     ),
 ]
 data = dict(
-    samples_per_gpu=8,
+    samples_per_gpu=4,
     workers_per_gpu=4,
     train=dict(
         type=dataset_type,
