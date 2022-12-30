@@ -1,7 +1,9 @@
 import wandb
 _base_ = [
-    '../../mmsegmentation/configs/_base_/models/fcn_r50-d8.py', '../_base_/custom.py',
-    '../../mmsegmentation/configs/_base_/default_runtime.py','../_base_/scheduler_epochs_60.py',
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/models/fcn_r50-d8.py',
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/_base_/custom.py',
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/default_runtime.py', 
+    # '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/schedules/schedule_40k.py'
 ]
 model = dict(
     backbone=dict(dilations=(1, 1, 1, 2), strides=(1, 2, 2, 1)),
@@ -21,7 +23,7 @@ log_config = dict(
             init_kwargs=dict(
                 project='Segmentation_project',
                 entity = 'aitech4_cv3',
-                name = "test_wandb"),)
+                name = "test_JN"),)
         # log_checkpoint=True,
         # log_checkpoint_metadata=True,
         # dict(type='TensorboardLoggerHook')

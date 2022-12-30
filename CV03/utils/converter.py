@@ -16,7 +16,7 @@ import numpy as np
 
 ROOT = '/opt/ml/input/data'
 TRAINJSON = '/opt/ml/input/data/train.json'
-VALJSON = './opt/ml/input/data/val.json'
+VALJSON = '/opt/ml/input/data/val.json'
 TESTJSON = '/opt/ml/input/data/test.json'
 
 category_names = [
@@ -175,7 +175,10 @@ def main():
 
     # copy images
     copy_images(TRAINJSON, dir_lists[0])
-    create_mask(TRAINJSON, dir_lists[1])
+    create_mask(TRAINJSON, dir_lists[2])
+    copy_images(VALJSON, dir_lists[1])
+    create_mask(VALJSON, dir_lists[3])
+    copy_images(TESTJSON, dir_lists[4])
     print('Done!')
 
 if __name__ == '__main__':
