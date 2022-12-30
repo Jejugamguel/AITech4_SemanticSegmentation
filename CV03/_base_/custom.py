@@ -10,6 +10,8 @@ crop_size = (640, 640)
 
 cfg = json.load(open("/opt/ml/config.json", "r"))
 
+cfg = json.load(open("/opt/ml/config.json", "r"))
+
 classes = [
     "Background",
     "General trash",
