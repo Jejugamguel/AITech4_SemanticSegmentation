@@ -2,3 +2,5 @@
 /opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/tools/browse_dataset.py
 work_dirs
 wandb
+output
+tmp
