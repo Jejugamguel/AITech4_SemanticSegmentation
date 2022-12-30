@@ -6,7 +6,7 @@ data_root = "/opt/ml/input/data"
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True
 )
-crop_size = (512, 512)
+crop_size = (640, 640)
 
 cfg = json.load(open("/opt/ml/config.json", "r"))
 
