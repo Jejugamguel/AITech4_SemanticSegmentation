@@ -30,7 +30,6 @@ model = dict(
 
 optimizer = dict(
     constructor='LearningRateDecayOptimizerConstructor',
-    _delete_=True,
     type='AdamW',
     lr=0.00008,
     betas=(0.9, 0.999),
@@ -42,7 +41,6 @@ optimizer = dict(
     })
 
 lr_config = dict(
-    _delete_=True,
     policy='poly',
     warmup='linear',
     warmup_iters=1500,
