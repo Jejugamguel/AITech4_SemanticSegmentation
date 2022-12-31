@@ -46,9 +46,9 @@ class RandomCutmix(object):
         if 'cutmix_scale' not in results:
             results['cutmix_scale'] = self.patch_scale
         if results['cutmix']:
-            img_name_list = glob.glob(results['img_prefix']+'*')
+            img_name_list = glob.glob(results['img_prefix']+'/*')
             patch_image_path = random.choice(img_name_list)
-            patch_mask_path = patch_image_path.replace('images', 'mask').replace('jpg', 'png')
+            patch_mask_path = patch_image_path.replace('train', 'mask').replace('jpg', 'png')
             patch_image = np.array(Image.open(patch_image_path))[:, :, ::-1]
             patch_mask = np.array(Image.open(patch_mask_path)) 
             
