@@ -3,11 +3,11 @@ _base_ = [
     '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/configs/Augmentation/Aug_albu.py','../../../mmsegmentation/configs/_base_/default_runtime.py',
 #    '../../_base_/scheduler_epochs_60.py'
 ]
-
-
 import wandb
+
+
 norm_cfg = dict(type='BN', requires_grad=True)
-crop_size = (512, 512)
+crop_size = (640, 640)
 checkpoint_file = 'https://download.openmmlab.com/mmclassification/v0/convnext/downstream/convnext-xlarge_3rdparty_in21k_20220301-08aa5ddc.pth'  # noqa
 model = dict(
     backbone=dict(
@@ -25,8 +25,7 @@ model = dict(
         num_classes=11,
     ),
     auxiliary_head=dict(in_channels=1024, num_classes=11),
-    test_cfg=dict(mode='slide', crop_size=crop_size,  stride=(341, 341)),
-)
+    test_cfg=dict(mode='slide', crop_size=crop_size, stride=(426, 426))),
 
 optimizer = dict(
     constructor='LearningRateDecayOptimizerConstructor',
@@ -50,7 +49,7 @@ lr_config = dict(
     by_epoch=False)
 
 # By default, models are trained on 8 GPUs with 2 images per GPU
-data = dict(samples_per_gpu=8)
+data = dict(samples_per_gpu=4)
 # fp16 settings
 optimizer_config = dict(type='Fp16OptimizerHook', loss_scale='dynamic')
 # fp16 placeholder
@@ -70,7 +69,7 @@ log_config = dict(
             init_kwargs=dict(
                 project='Segmentation_project',
                 entity = 'aitech4_cv3',
-                name = "Covnext_b8_Cmix,Pca,Gamma"),)
+                name = "Covnext_b4_Cmix,Pca,Gamma"),)
         # log_checkpoint=True,
         # log_checkpoint_metadata=True,
         # dict(type='TensorboardLoggerHook')
