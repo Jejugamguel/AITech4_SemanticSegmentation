@@ -23,7 +23,7 @@ def parse_args():
         '--show', action='store_true', help='show confusion matrix')
     parser.add_argument(
         '--color-theme',
-        default='winter',
+        default='Blues',
         help='theme of the matrix color map')
     parser.add_argument(
         '--title',
@@ -140,8 +140,8 @@ def plot_confusion_matrix(confusion_matrix,
                           ) if not np.isnan(confusion_matrix[i, j]) else -1),
                 ha='center',
                 va='center',
-                color='w',
-                size=7)
+                color='black',
+                size=15)
 
     ax.set_ylim(len(confusion_matrix) - 0.5, -0.5)  # matplotlib>3.1.1
 
