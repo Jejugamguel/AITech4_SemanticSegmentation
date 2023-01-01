@@ -140,7 +140,7 @@ class Transpose2(object):
 
 
 @PIPELINES.register_module()
-class Blur(object):
+class ElasticTransform(object):
     """
     Blur the input image using a Gaussian filter with a random kernel size.
     
@@ -151,10 +151,19 @@ class Blur(object):
         prob (float, optional) : probability of applying ChannelShuffle
         
     """
-    def __init__(self,prob,blur_limit=(3 ,7), sigma_limit=0):
+    def __init__(self,prob,alpha=1, sigma=50,alpha_affine=50, interpolation=1,\
+        border_mode=4, value=None, mask_value=None, \
+        approximate=False, same_dxdy=False):
         self.prob = prob
-        self.blur_limit = blur_limit
-        self.sigma_limit = sigma_limit
+        self.alpha = alpha
+        self.sigma = sigma
+        self.alpha_affine = alpha_affine
+        self.interpolation = interpolation
+        self.border_mode = border_mode
+        self.value = value
+        self.mask_value = mask_value
+        self.approximate = approximate
+        self.same_dxdy = same_dxdy
 
         if prob is not None:
             assert prob >= 0 and prob <= 1
@@ -163,17 +172,17 @@ class Blur(object):
 
 
     def __call__(self, results):
-        if 'blur' not in results:
+        if 'ElasticTransform' not in results:
             transpose = True if np.random.rand() < self.prob else False
-            results['blur'] = transpose
+            results['ElasticTransform'] = transpose
 
-        if results['blur']:
+        if results['ElasticTransform']:
             image = results['img']
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             mask = results['gt_semantic_seg']
 
             transform = A.Compose([
-                        A.GaussianBlur(p=self.prob,blur_limit=self.blur_limit,sigma_limit=self.sigma_limit),
+                        A.ElasticTransform(p=self.prob),
                         ],
                         p=1)
             transformed = transform(image=image, mask=mask )

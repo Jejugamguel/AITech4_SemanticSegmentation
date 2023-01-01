@@ -1,6 +1,6 @@
 _base_ = [
     '../../../mmsegmentation/configs/_base_/models/upernet_convnext.py',
-    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/configs/Augmentation/Aug_albu.py', '../../../mmsegmentation/configs/_base_/default_runtime.py',
+    "/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/configs/Augmentation/Aug_ClaCropPhotoMetric_TTA.py", '../../../mmsegmentation/configs/_base_/default_runtime.py',
     '../../_base_/scheduler_epochs_60.py'
 ]
 import wandb
@@ -51,12 +51,12 @@ lr_config = dict(
     by_epoch=False)
 
 # By default, models are trained on 8 GPUs with 2 images per GPU
-data = dict(samples_per_gpu=4)
+data = dict(samples_per_gpu=8)
 # fp16 settings
 optimizer_config = dict(type='Fp16OptimizerHook', loss_scale='dynamic')
 # fp16 placeholder
 fp16 = dict()
-runner = dict(type='EpochBasedRunner', max_epochs=60)
+runner = dict(type='EpochBasedRunner', max_epochs=120)
 checkpoint_config = dict(interval=1, max_keep_ckpts=3)
 evaluation = dict(interval=1, metric='mIoU', pre_eval=True,save_best='mIoU')
 
@@ -71,7 +71,7 @@ log_config = dict(
             init_kwargs=dict(
                 project='Segmentation_project',
                 entity = 'aitech4_cv3',
-                name = "Covnext_b4_cmix_gamma_pca"),)
+                name = "Covnext_Clahe_Crop_PhotoMetric_TTA"),)
         # log_checkpoint=True,
         # log_checkpoint_metadata=True,
         # dict(type='TensorboardLoggerHook')
