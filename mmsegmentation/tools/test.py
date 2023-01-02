@@ -336,7 +336,7 @@ def main():
         submission = submission.append({"image_id" : file_name, "PredictionString" : ' '.join(str(e) for e in string.tolist())}, 
                                     ignore_index=True)
 
-    submission.to_csv('/opt/ml/input/code/submission/upernet_swint.csv', index=False)
+    submission.to_csv('/opt/ml/input/code/submission/upernet_beit_photometricdistortion.csv', index=False)
 
 if __name__ == '__main__':
     main()

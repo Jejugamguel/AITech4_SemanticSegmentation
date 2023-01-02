@@ -1,16 +1,13 @@
-import wandb
 _base_ = [
-    # '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/models/upernet_beit.py',
-    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/_base_/custom.py',
-    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/default_runtime.py', 
-    # '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/schedules/schedule_40k.py'
+    '../../../mmsegmentation/configs/_base_/models/upernet_beit.py', '../../_base_/custom.py',
+    '../../../mmsegmentation/configs/_base_/default_runtime.py', #'../_base_/scheduler_160k.py'
 ]
 
-
+import wandb
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
     type='EncoderDecoder',
-    pretrained='/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/pretrain/beit_base_patch16_224_pt22k_ft22k.pth',
+    pretrained='https://conversationhub.blob.core.windows.net/beit-share-public/beit/beit_base_patch16_224_pt22k_ft22k.pth',
     backbone=dict(
         type='BEiT',
         img_size=(640, 640),
@@ -56,19 +53,16 @@ model = dict(
             type='CrossEntropyLoss', use_sigmoid=False, loss_weight=0.4)),
     # model training and testing settings
     train_cfg=dict(),
-    test_cfg=dict(mode='whole'))
-
+    test_cfg=dict(mode='slide', crop_size=(640, 640), stride=(426, 426)))
 
 optimizer = dict(
     type='AdamW',
     lr=3e-5,
-        betas=(0.9, 0.999),
+    betas=(0.9, 0.999),
     weight_decay=0.05,
     constructor='LayerDecayOptimizerConstructor',
     paramwise_cfg=dict(num_layers=12, layer_decay_rate=0.9))
 optimizer_config = dict()
-
-# learning policy
 lr_config = dict(
     policy='poly',
     warmup='linear',
@@ -77,14 +71,13 @@ lr_config = dict(
     power=1.0,
     min_lr=0.0,
     by_epoch=False)
-    
+
+# By default, models are trained on 8 GPUs with 2 images per GPU
+data = dict(samples_per_gpu=4)
 # runtime settings
 runner = dict(type='EpochBasedRunner', max_epochs=60)
 checkpoint_config = dict(interval=1, max_keep_ckpts=3)
 evaluation = dict(interval=1, metric='mIoU', pre_eval=True,save_best='mIoU')
-
-
-
 wandb.login()
 # yapf:disable
 log_config = dict(
@@ -95,11 +88,9 @@ log_config = dict(
             init_kwargs=dict(
                 project='Segmentation_project',
                 entity = 'aitech4_cv3',
-                name = "upernet_base_photometricdistortion"),)
+                name = "BEiT_base_60e"),)
         # log_checkpoint=True,
         # log_checkpoint_metadata=True,
-        # dict(type='TensorboardLoggerHook')
-        # dict(type='PaviLoggerHook') # for internal services
     ])
 
 
