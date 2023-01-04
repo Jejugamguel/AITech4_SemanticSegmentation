@@ -1,7 +1,8 @@
 _base_ = [
-    '/opt/ml/CV03/mmsegmentation/configs/_base_/models/upernet_convnext.py',
-    '/opt/ml/CV03/CV03/configs/Augmentation/Aug_NCmx.py', '/opt/ml/CV03/mmsegmentation/configs/_base_/default_runtime.py',
-    '/opt/ml/CV03/CV03/_base_/scheduler_epochs_60.py'
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/models/upernet_convnext.py',
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/configs/Augmentation/Aug_NCmx.py', 
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/default_runtime.py',
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/_base_/scheduler_epochs_60.py'
 ]
 import wandb
 
