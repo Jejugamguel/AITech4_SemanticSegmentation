@@ -18,12 +18,12 @@ __all__ = [
     'RandomMosaic'
 ]
 
-from .my_transform import RandomCutmix
+from .my_transform import RandomCutmix, FancyPCA, CopyPaste
 __all__ = [
     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor', 'ToDataContainer',
     'Transpose', 'Collect', 'LoadAnnotations', 'LoadImageFromFile',
     'MultiScaleFlipAug', 'Resize', 'RandomFlip', 'Pad', 'RandomCrop',
     'Normalize', 'SegRescale', 'PhotoMetricDistortion', 'RandomRotate',
     'AdjustGamma', 'CLAHE', 'Rerange', 'RGB2Gray', 'RandomCutOut',
-    'RandomMosaic', 'RandomCutmix'
+    'RandomMosaic', 'RandomCutmix', 'FancyPCA', 'CopyPaste'
 ]

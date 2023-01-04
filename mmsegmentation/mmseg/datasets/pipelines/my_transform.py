@@ -1,6 +1,10 @@
 import glob
 import numpy as np
 from numpy import random
+import mmcv
+import cv2
+import os
+import albumentations as A
 from PIL import Image
 from ..builder import PIPELINES
 
@@ -48,7 +52,7 @@ class RandomCutmix(object):
         if results['cutmix']:
             img_name_list = glob.glob(results['img_prefix']+'*')
             patch_image_path = random.choice(img_name_list)
-            patch_mask_path = patch_image_path.replace('images', 'mask').replace('jpg', 'png')
+            patch_mask_path = os.path.join(results['seg_prefix'], os.path.basename(patch_image_path)).replace('jpg', 'png')
             patch_image = np.array(Image.open(patch_image_path))[:, :, ::-1]
             patch_mask = np.array(Image.open(patch_mask_path)) 
             
@@ -65,3 +69,126 @@ class RandomCutmix(object):
     
     def __repr__(self):
         return self.__class__.__name__ + f'(prob={self.prob}, patch_scale={self.patch_scale})'
+    
+    
+@PIPELINES.register_module()
+class FancyPCA(object):
+    """
+    Transpose the input by swapping rows and columns.
+    
+    input : dict
+    output : dict
+    
+    Args:
+        prob (float, optional) : probability of applying ChannelShuffle
+        
+    """
+# 필요한 매개변수 설정(prob, size, limit....등)
+    def __init__(self,prob):
+        self.prob = prob
+
+        if prob is not None:
+            assert prob >= 0 and prob <= 1
+
+# call 함수에서 transform에 적용하고자하는 augmentation 작성
+    def __call__(self, results):
+        if 'fancypca' not in results:
+            fancypca = True if np.random.rand() < self.prob else False
+            results['fancypca'] = fancypca
+
+        if results['fancypca']:
+            image = results['img']
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            mask = results['gt_semantic_seg']
+
+            transform = A.Compose([
+                        A.FancyPCA(p=self.prob),
+                        ],
+                        p=1)
+            transformed = transform(image=image, mask=mask )
+            results['img'] = transformed['image']
+            results['gt_semantic_seg'] = transformed['mask']
+        return results
+
+    
+    def __repr__(self):
+        return self.__class__.__name__ + f'(prob={self.prob})'
+    
+
+@PIPELINES.register_module()
+class CopyPaste(object):
+    """
+    Copy segmentation annotation and Paste on the other Image
+    
+    Args:
+        prob : (float, optional) : The probability of applying CopyPaste
+        mode : (str, optional) : Select 'all' or 'one'
+                                 all : paste all annotation of all categories from Image
+                                 one : paste all annotation of one category from Image
+        patch_scale_ratio : (float, optional) : resize ratio of patch image (annotation)
+    """
+    
+    def __init__(self, prob, mode, patch_scale_ratio=0.5):
+        assert prob >= 0 and prob <= 1
+        assert mode in ['all', 'one']
+        assert 0 < patch_scale_ratio <= 1
+        self.prob = prob
+        self.mode = mode
+        self.patch_scale_ratio = patch_scale_ratio
+
+    def get_indexes(self, dataset):
+        indexes = [random.randint(0, len(dataset))]
+        return indexes
+    
+    def _make_copy_paste_(self, results):
+        assert 'mix_results' in results
+        patch_image_x = int(self.patch_scale_ratio * results['mix_results'][0]['img_shape'][0])
+        patch_image_y = int(self.patch_scale_ratio * results['mix_results'][0]['img_shape'][1])
+        assert 0< patch_image_x and 0 < patch_image_y
+
+        patch_img = results['mix_results'][0]['img']
+        patch_img = mmcv.imresize(patch_img, (patch_image_x, patch_image_y))
+        patch_mask = results['mix_results'][0]['gt_semantic_seg']
+        patch_mask = mmcv.imresize(patch_mask, (patch_image_x, patch_image_y))
+        
+        position_img = np.zeros(results['img'].shape)
+        position_mask = np.zeros(results['gt_semantic_seg'].shape)
+        
+        max_row_id = results['img_shape'][0] - patch_image_x
+        max_col_id = results['img_shape'][1] - patch_image_y
+        tl_row = random.randint(0, max_row_id)
+        tl_col = random.randint(0, max_col_id)       
+
+        if self.mode == 'all':
+            seg_TF = patch_mask != 0
+            
+        elif self.mode == 'one':
+            cls_list = np.delete(np.sort(np.unique(patch_mask)), 0)
+            assert len(cls_list) > 0
+            cls = random.choice(cls_list)
+            seg_TF = patch_mask == cls
+
+        position_img[tl_row:tl_row+patch_image_x, tl_col:tl_col+patch_image_y, :] \
+            = np.ones((1, 1, 3)) * seg_TF.reshape(*seg_TF.shape, 1)
+        position_img = np.bool8(position_img)    
+        position_mask[tl_row:tl_row+patch_image_x, tl_col:tl_col+patch_image_y] \
+            = seg_TF
+        position_mask = np.bool8(position_mask)
+            
+        position_pat_img = np.bool8(np.ones((1, 1, 3)) * seg_TF.reshape(*seg_TF.shape, 1))
+        
+        results['img'][position_img] = patch_img[position_pat_img]
+        results['gt_semantic_seg'][position_mask] = patch_mask[seg_TF]
+            
+        return results
+                
+    def __call__(self, results):
+        if 'copypaste' not in results:
+            copypaste = True if np.random.rand() < self.prob else False
+            results['copypaste'] = copypaste
+        if results['copypaste']:
+            results = self._make_copy_paste_(results)
+        return results
+            
+    def __repr__(self):
+        return self.__class__.__name__ + f'(prob={self.prob}, mode={self.mode}, patch_scale_ratio={self.patch_scale_ratio})'
