@@ -11,15 +11,15 @@ from .transforms import (CLAHE, AdjustGamma, Normalize, Pad,
 
 from .my_transform import CropNonEmptyMaskIfExists
 
-from .albu import ChannelShuffle,A_CLAHE,Transpose2,ElasticTransform,SafeRotate,FancyPCA
-from .my_transform import CropNonEmptyMaskIfExists
+from .albu import A_CLAHE,ElasticTransform,SafeRotate,FancyPCA
+from .my_transform import CropNonEmptyMaskIfExists, RandomCutmix
 __all__ = [
     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor', 'ToDataContainer',
     'Transpose', 'Collect', 'LoadAnnotations', 'LoadImageFromFile',
     'MultiScaleFlipAug', 'Resize', 'RandomFlip', 'Pad', 'RandomCrop',
     'Normalize', 'SegRescale', 'PhotoMetricDistortion', 'RandomRotate',
     'AdjustGamma', 'CLAHE', 'Rerange', 'RGB2Gray', 'RandomCutOut',
-    'RandomMosaic','Transpose2','A_CLAHE','ChannelShuffle','ElasticTransform',
+    'RandomMosaic','Transpose2','A_CLAHE','ElasticTransform',
     'SafeRotate',"RandomCutmix","FancyPCA", 'CropNonEmptyMaskIfExists'
 ]
 
