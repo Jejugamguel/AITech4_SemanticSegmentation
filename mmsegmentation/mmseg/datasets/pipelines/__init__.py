@@ -30,6 +30,6 @@ __all__ = [
 #     'MultiScaleFlipAug', 'Resize', 'RandomFlip', 'Pad', 'RandomCrop',
 #     'Normalize', 'SegRescale', 'PhotoMetricDistortion', 'RandomRotate',
 #     'AdjustGamma', 'CLAHE', 'Rerange', 'RGB2Gray', 'RandomCutOut',
-#     'RandomMosaic', 'RandomCutmix','ChannelShuffle'
+#     'RandomMosaic', 'RandomCutmix', 'ChannelShuffle', 'CopyPaste'
 # ]
 
