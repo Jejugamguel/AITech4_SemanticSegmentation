@@ -1,7 +1,8 @@
 _base_ = [
-    '/opt/ml/CV03/mmsegmentation/configs/_base_/models/upernet_convnext.py',
-    '/opt/ml/CV03/CV03/configs/Augmentation/Aug_final.py', '/opt/ml/CV03/mmsegmentation/configs/_base_/default_runtime.py',
-    '/opt/ml/CV03/CV03/_base_/scheduler_epochs_60.py'
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/models/upernet_convnext.py',
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/configs/Augmentation/Aug_final.py', 
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/default_runtime.py',
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/_base_/scheduler_epochs_60.py'
 ]
 import wandb
 
@@ -72,7 +73,7 @@ log_config = dict(
             init_kwargs=dict(
                 project='Segmentation_project',
                 entity = 'aitech4_cv3',
-                name = "Covnext_Aug_final"),)
+                name = "Covnext_Aug_final(train_test)"),)
         # log_checkpoint=True,
         # log_checkpoint_metadata=True,
         # dict(type='TensorboardLoggerHook')
