@@ -9,25 +9,16 @@ from .transforms import (CLAHE, AdjustGamma, Normalize, Pad,
                          RandomFlip, RandomMosaic, RandomRotate, Rerange,
                          Resize, RGB2Gray, SegRescale)
 
-from .albu import ChannelShuffle,A_CLAHE,Transpose2,Blur,SafeRotate,FancyPCA
-from .my_transform import RandomCutmix
+from .my_transform import CropNonEmptyMaskIfExists
+
+from .albu import A_CLAHE,ElasticTransform,SafeRotate,FancyPCA
+from .my_transform import CropNonEmptyMaskIfExists, RandomCutmix
 __all__ = [
     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor', 'ToDataContainer',
     'Transpose', 'Collect', 'LoadAnnotations', 'LoadImageFromFile',
     'MultiScaleFlipAug', 'Resize', 'RandomFlip', 'Pad', 'RandomCrop',
     'Normalize', 'SegRescale', 'PhotoMetricDistortion', 'RandomRotate',
     'AdjustGamma', 'CLAHE', 'Rerange', 'RGB2Gray', 'RandomCutOut',
-    'RandomMosaic','Transpose2','A_CLAHE','ChannelShuffle','Blur',
-    'SafeRotate',"RandomCutmix","FancyPCA"
+    'RandomMosaic','Transpose2','A_CLAHE','ElasticTransform',
+    'SafeRotate',"RandomCutmix","FancyPCA", 'CropNonEmptyMaskIfExists'
 ]
-
-
-# __all__ = [
-#     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor', 'ToDataContainer',
-#     'Transpose', 'Collect', 'LoadAnnotations', 'LoadImageFromFile',
-#     'MultiScaleFlipAug', 'Resize', 'RandomFlip', 'Pad', 'RandomCrop',
-#     'Normalize', 'SegRescale', 'PhotoMetricDistortion', 'RandomRotate',
-#     'AdjustGamma', 'CLAHE', 'Rerange', 'RGB2Gray', 'RandomCutOut',
-#     'RandomMosaic', 'RandomCutmix','ChannelShuffle'
-# ]
-

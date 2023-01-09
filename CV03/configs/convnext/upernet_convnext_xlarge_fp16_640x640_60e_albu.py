@@ -1,11 +1,9 @@
 _base_ = [
     '../../../mmsegmentation/configs/_base_/models/upernet_convnext.py',
-    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/configs/Augmentation/Aug_albu.py','../../../mmsegmentation/configs/_base_/default_runtime.py',
-#    '../../_base_/scheduler_epochs_60.py'
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/configs/Augmentation/Aug_albu.py', '../../../mmsegmentation/configs/_base_/default_runtime.py',
+    '../../_base_/scheduler_epochs_60.py'
 ]
 import wandb
-
-
 norm_cfg = dict(type='BN', requires_grad=True)
 crop_size = (640, 640)
 checkpoint_file = 'https://download.openmmlab.com/mmclassification/v0/convnext/downstream/convnext-xlarge_3rdparty_in21k_20220301-08aa5ddc.pth'  # noqa
@@ -23,12 +21,15 @@ model = dict(
     decode_head=dict(
         in_channels=[256, 512, 1024, 2048],
         num_classes=11,
+        norm_cfg=norm_cfg,
     ),
-    auxiliary_head=dict(in_channels=1024, num_classes=11),
-    test_cfg=dict(mode='slide', crop_size=crop_size, stride=(426, 426))),
+    auxiliary_head=dict(in_channels=1024, num_classes=11, norm_cfg=norm_cfg,),
+    test_cfg=dict(mode='slide', crop_size=crop_size, stride=(426, 426)),
+)
 
 optimizer = dict(
     constructor='LearningRateDecayOptimizerConstructor',
+    _delete_=True,
     type='AdamW',
     lr=0.00008,
     betas=(0.9, 0.999),
@@ -40,6 +41,7 @@ optimizer = dict(
     })
 
 lr_config = dict(
+    _delete_=True,
     policy='poly',
     warmup='linear',
     warmup_iters=1500,
@@ -69,7 +71,7 @@ log_config = dict(
             init_kwargs=dict(
                 project='Segmentation_project',
                 entity = 'aitech4_cv3',
-                name = "Covnext_b4_Cmix,Pca,Gamma"),)
+                name = "Covnext_b4_cmix_gamma_pca"),)
         # log_checkpoint=True,
         # log_checkpoint_metadata=True,
         # dict(type='TensorboardLoggerHook')
