@@ -1,6 +1,6 @@
 _base_ = [
     '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/models/upernet_convnext.py',
-    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/_base_/custom.py', 
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/configs/Augmentation/Aug_NCmxCla.py', 
     '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/default_runtime.py',
     '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/_base_/scheduler_epochs_60.py'
 ]
@@ -71,7 +71,7 @@ log_config = dict(
             init_kwargs=dict(
                 project='Segmentation_project',
                 entity = 'aitech4_cv3',
-                name = "Covnext"),)
+                name = "Covnext_Aug_NCmxCla"),)
         # log_checkpoint=True,
         # log_checkpoint_metadata=True,
         # dict(type='TensorboardLoggerHook')

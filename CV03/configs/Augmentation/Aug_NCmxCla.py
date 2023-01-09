@@ -1,12 +1,16 @@
+# mmseg가 모듈에서 임포트되는 것이 아닌, 로컬 레포지토리에서 임포트되어야 함
+#import sys
+#sys.path.append('/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/')
+
 import json
 
 # dataset settings
 dataset_type = "CustomDataset"
 data_root = "/opt/ml/input/data"
 img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True
+    mean=[117.323, 112.092, 106.659], std=[59.772, 58.859, 62.124], to_rgb=True
 )
-crop_size = (640, 640)
+crop_size = (512, 512)
 
 cfg = json.load(open("/opt/ml/config.json", "r"))
 
@@ -41,9 +45,11 @@ palette = [
 train_pipeline = [
     dict(type="LoadImageFromFile"),
     dict(type="LoadAnnotations"),
-    dict(type="Resize", img_scale=(640, 640)),
+    dict(type="Resize", img_scale=(512, 512)),
     dict(type="RandomFlip", prob=0.5),
-    dict(type="RandomRotate", prob=0.5, degree=45),
+    dict(type="RandomCutmix", prob=1, patch_scale=(256, 256)),
+    dict(type="RandomRotate", prob=0.8, degree=30),
+    dict(type="CLAHE"),
     dict(type="Normalize", **img_norm_cfg),
     dict(type="Pad", size=crop_size, pad_val=0, seg_pad_val=255),
     dict(type="DefaultFormatBundle"),
@@ -54,7 +60,7 @@ val_pipeline = [
     dict(type="LoadImageFromFile"),
     dict(
         type="MultiScaleFlipAug",
-        img_scale=(640, 640),
+        img_scale=(512, 512),
         flip=False,
         transforms=[
             dict(type="Resize", keep_ratio=True),
@@ -70,7 +76,7 @@ test_pipeline = [
     dict(type="LoadImageFromFile"),
     dict(
         type="MultiScaleFlipAug",
-        img_scale=(640,640),
+        img_scale=(512, 512),
         flip=False,
         transforms=[
             dict(type="Resize", keep_ratio=True),

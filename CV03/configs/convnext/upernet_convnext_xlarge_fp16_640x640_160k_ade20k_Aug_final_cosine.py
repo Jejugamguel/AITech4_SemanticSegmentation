@@ -1,12 +1,14 @@
 _base_ = [
     '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/models/upernet_convnext.py',
-    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/_base_/custom.py', 
+    '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/configs/Augmentation/Aug_final.py', 
     '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/mmsegmentation/configs/_base_/default_runtime.py',
     '/opt/ml/level2_semanticsegmentation_cv-level2-cv-03/CV03/_base_/scheduler_epochs_60.py'
 ]
 import wandb
 
-crop_size = (640, 640)
+norm_cfg = dict(type='BN', requires_grad=True)
+crop_size = (512, 512)
+
 checkpoint_file = 'https://download.openmmlab.com/mmclassification/v0/convnext/downstream/convnext-xlarge_3rdparty_in21k_20220301-08aa5ddc.pth'  # noqa
 model = dict(
     backbone=dict(
@@ -24,7 +26,7 @@ model = dict(
         num_classes=11,
     ),
     auxiliary_head=dict(in_channels=1024, num_classes=11),
-    test_cfg=dict(mode='slide', crop_size=crop_size, stride=(426, 426)),
+    test_cfg=dict(mode='slide', crop_size=crop_size, stride=(341, 341)),
 )
 
 optimizer = dict(
@@ -42,11 +44,10 @@ optimizer = dict(
 
 lr_config = dict(
     _delete_=True,
-    policy='poly',
+    policy='CosineAnnealing',
     warmup='linear',
     warmup_iters=1500,
     warmup_ratio=1e-6,
-    power=1.0,
     min_lr=0.0,
     by_epoch=False)
 
@@ -71,7 +72,7 @@ log_config = dict(
             init_kwargs=dict(
                 project='Segmentation_project',
                 entity = 'aitech4_cv3',
-                name = "Covnext"),)
+                name = "Covnext_Aug_final"),)
         # log_checkpoint=True,
         # log_checkpoint_metadata=True,
         # dict(type='TensorboardLoggerHook')
