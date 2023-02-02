@@ -50,9 +50,9 @@
 &nbsp;
 
 # 프로젝트 수행 절차
-<h3> 1. 데이터 EDA  </h3>
+<h3> 1. EDA  </h3>
 <h3> 2. 모델 및 Augmentation 기법 탐색  </h3>
-<h3> 3. Baseline 모델 선정 및 최적 Augmentation 기법 선정  </h3>
+<h3> 3. 모델 선정 및 최적 Augmentation 기법 선정  </h3>
 <h3> 4. Hyperparameter Tuning  </h3>
 <h3> 5. Pseudo Labeling </h3>
 <h3> 6. Model Ensemble  </h3>
