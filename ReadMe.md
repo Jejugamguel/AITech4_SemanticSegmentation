@@ -1,4 +1,4 @@
-![header](https://capsule-render.vercel.app/api?type=rect&color=gradient&text=재활용%20품목%20분류를%20위한%20Semantic%20Segmentation&fontSize=32)
+![header](https://capsule-render.vercel.app/api?type=rect&color=0:87CEFA,100:4169E1&text=재활용%20품목%20분류를%20위한%20Semantic%20Segmentation&fontSize=32)
 <div align="left">
 	<img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=Python&logoColor=white" />
 	<img src="https://img.shields.io/badge/Pytorch-EE4C2C?style=flat&logo=Pytorch&logoColor=white" />
@@ -16,40 +16,34 @@
 &nbsp;
 
 # 프로젝트 개요
-> 대량 생산, 대량 소비의 시대에 접어들면서 '쓰레기 대란' 문제가 함께 수면 위로 떠올랐습니다. 많은 쓰레기가 배출되면서 환경 오염 문제가 대두되었고, 이를 해결하기 위해 올바른 분리수거 습관을 함양해야 한다는 목소리가 강해졌습니다. 잘 분리된 쓰레기는 다시 자원으로서의 가치를 인정받기에, 재활용 품목을 분류하는 Semantic Segmentation 모델을 설계하여 환경 부담을 줄이는 과제에 앞장설 것입니다.  
-빠르고 정확한 분리수거를 통해 직접적으로 환경을 개선할 뿐만 아니라 아이들의 분리수거 교육 등에 활용되어 많은 사람들이 분리수거를 올바르게 행할 수 있도록 영향력을 줄 것입니다. 🌎 <sup>[[1]](#footnote_1)</sup>
+> 대량 생산, 대량 소비의 시대에 접어들면서 '쓰레기 대란' 문제가 함께 수면 위로 떠올랐습니다. 많은 쓰레기가 배출되면서 환경 오염 문제가 대두되었고, 이를 해결하기 위해 올바른 분리수거 습관을 함양해야 한다는 목소리가 강해졌습니다. 잘 분리된 쓰레기는 다시 자원으로서의 가치를 인정받기에, 재활용 품목을 분류하는 Semantic Segmentation 모델을 설계하여 환경 부담을 줄이는 과제에 앞장설 것입니다.
 
 &nbsp;
 
 # 데이터셋 구조
 ```
 ├─ input
-│	├─ code
-│	│	└─ submision
-│	└─ data
-│		├─ train
-│		│	├─ images
-│		│	│		0000.jpg
-│		│	└─ mask
-│		│			0000.png
-│		├─ valid
-│		│	├─ images
-│		│	│		0000.jpg
-│		│	└─ mask
-│		│			0000.png
-│		└─ test
-│			└─ images
-│					0000.jpg
+│  ├─ code
+│  │  └─ submision
+│  └─ data
+│     ├─ train
+│     │  ├─ images
+│     │  └─ mask
+│     ├─ valid
+│     │  ├─ images
+│     │  └─ mask
+│     └─ test
+│        └─ images
 │
-└─ semantic_segmentation
-	├─ CV03
-	│	├─ _base_
-	│	├─ configs
-	│	│	├─ Augmentation
-	│	│	├─ model1
-	│	│	└─ model2
-	│	└─ utils
-	└─ mmsegmentation
+└─ Repo
+   ├─ CV03
+   │  ├─ _base_
+   │  ├─ configs
+   │  │  ├─ Augmentation
+   │  │  ├─ model1
+   │  │  └─ model2
+   │  └─ utils
+   └─ mmsegmentation
 ```	
 
 
@@ -81,7 +75,7 @@
 &nbsp;
 
 # 모델 및 Data Augmentation
-- UPerNet_ConvNeXt
+- UPerNet ConvNeXt
 	- RandomCutmix (prob=1, patch_scale=(256, 256))  
 	 (or CopyPaste (prob=1, mode=all, patch_scale_ratio=0.75))
 	- PhotoMetricDistortion
@@ -90,7 +84,7 @@
 	- RandomRotate (prob=0.8, degree=30)
 	- Pad (size=(512, 512), pad_val=0)
    
-- UPerNet_BEiT_base
+- UPerNet BEiT Base
 	- RandomCutmix (prob=1, patch_scale=(256, 256))  
 	 (or CopyPaste (prob=1, mode=all, patch_scale_ratio=0.75))
 	- PhotoMetricDistortion
@@ -110,9 +104,5 @@
 
 <h3> 2. Model Ensemble   </h3>  
 
-- Backbone으로서 CNN 계열을 사용하는 UPerNet_ConvNeXt와 Transformer 계열을 사용하는 UPerNet_BEiT는 약간 상이한 예측결과를 낸다는 점을 활용하여, 두 모델을 토대로 Model Ensemble을 진행하였다.
+- Backbone으로서 CNN 계열을 사용하는 UPerNet ConvNeXt와 Transformer 계열을 사용하는 UPerNet BEiT는 상이한 예측결과를 낸다는 점을 활용하여, 두 모델을 토대로 Model Ensemble을 진행하였다.
 - 각 픽셀 별로 Hard Voing을 진행하며, 동률인 픽셀에 대해서는 각 픽셀의 카테고리 Accuracy를 비교하여 높은 쪽의 픽셀을 채택하였고, 성능이 소량 향상하였다.
-
-
-# Reference
-<a name="footnote_1">[1]</a>  : AIstage
