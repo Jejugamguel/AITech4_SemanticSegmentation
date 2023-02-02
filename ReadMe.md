@@ -20,7 +20,7 @@
 
 &nbsp;
 
-# 데이터셋 구조
+# Repository 구조
 ```
 ├─ input
 │  ├─ code
